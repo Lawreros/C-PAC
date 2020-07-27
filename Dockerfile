@@ -196,6 +196,7 @@ RUN pip install --upgrade setuptools
 RUN pip install --upgrade pip
 RUN pip install -r /opt/requirements.txt
 RUN pip install xvfbwrapper
+RUN pip install aws-cli
 
 # install PyPEER
 RUN pip install git+https://github.com/ChildMindInstitute/PyPEER.git
@@ -209,12 +210,13 @@ RUN git lfs install
 
 # Get atlases
 RUN mkdir -p /ndmg_atlases/label && \
-    GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/neurodata/neuroparc.git /tmp/neuroparc && \
-    cd /tmp/neuroparc && \
-    git lfs install --skip-smudge && \
-    git lfs pull -I "atlases/label/Human/*" && \
-    cp -r /tmp/neuroparc/atlases/label/Human /ndmg_atlases/label && \
-    cd -
+    aws s3 cp s3://ndmg-data/Neuroparc/label/ /ndmg_atlases/label/ && \
+    #GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/neurodata/neuroparc.git /tmp/neuroparc && \
+    #cd /tmp/neuroparc && \
+    #git lfs install --skip-smudge && \
+    #git lfs pull -I "atlases/label/Human/*" && \
+    #cp -r /tmp/neuroparc/atlases/label/Human /ndmg_atlases/label && \
+    #cd -
 
 COPY dev/docker_data/default_pipeline.yml /cpac_resources/default_pipeline.yml
 COPY dev/circleci_data/pipe-test_ci.yml /cpac_resources/pipe-test_ci.yml
